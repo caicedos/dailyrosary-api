@@ -31,10 +31,11 @@ app.get('/', (req, res) => {
 
 app.post('/signin', (req, res) => {
     const { email, password } = req.body
+    console.log('calledddddd')
     if (!email || !password) {
         return res.status(400).json('incorrect form submission');
     }
-    console.log(email, hash)
+    console.log(email, password)
     db.select('email', 'hash').from('login')
         .where('email', '=', email)
         .then(data => {
@@ -101,3 +102,21 @@ app.listen(usedPort, () => {
     console.log(`app is running on port: ${usedPort}`)
 })
 
+// onSubmitSignIn = () => {
+
+//     fetch("https://mighty-inlet-18738.herokuapp.com/signin", {
+//       method: "post",
+//       headers: { "content-type": "application/json" },
+//       body: JSON.stringify({
+//         email: this.state.signInEmail,
+//         password: this.state.signInPassword
+//       })
+//     })
+//       .then(response => response.json())
+//       .then(user => {
+//         if (user[0].id) {
+//           this.props.loadUser(user[0]);
+//           this.props.onRouteChange("home");
+//         }
+//       });
+//   };
