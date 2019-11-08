@@ -31,7 +31,6 @@ app.get('/', (req, res) => {
 
 app.post('/signin', (req, res) => {
     const { email, password } = req.body
-    console.log('calledddddd')
     if (!email || !password) {
         return res.status(400).json('incorrect form submission');
     }
@@ -44,32 +43,38 @@ app.post('/signin', (req, res) => {
                 return db.select('*').from('users')
                     .where('email', '=', data[0].email)
                     .then(user => {
-                        res.json(user)
+                        res.json(user[0])
                     })
                     .catch(err => res.status(400).json('Unable to signin'))
             }
-            return res.status(400).json('wrong credentials 1')
+            return res.status(400).json('Wrong Credentials')
         })
         .catch(err => console.log(err))
 })
 
 app.post('/profile', (req, res) => {
-    const { id, prayed } = req.body
-    console.log(id, prayed)
+    const { id, prayed, streak, level } = req.body
+    console.log('me llamaronnnnnnnnnnnnnn')
+    console.log(id, prayed, streak, level)
     db('users')
         .where({ id: id })
-        .update({ prayed: prayed })
-        .catch(err => res.status(400).json('unable to ge user'))
+        .update({ prayed, streak, level })
+        .then(data=> {
+            console.log(data)
+          res.json(data)  
+        })
+        .catch(err => res.status(400).json(err))
 }
+
 )
 
 app.post('/register', (req, res) => {
-    const { name, email, password } = req.body
-    if(!email || !name || !password){
-        return res.status(400).json('incorrect from submission');
+    const { firstName, lastName, email, password } = req.body
+    if(!email || !firstName || !lastName || !password){
+        return res.status(400).json('Incorrect form submission');
     }
     var hash = bcrypt.hashSync(password, saltRounds);
-
+    console.log(firstName, lastName, email, password, hash)
     db.transaction(trx => {
         trx.insert({
             hash: hash,
@@ -82,17 +87,17 @@ app.post('/register', (req, res) => {
                 return db('users')
                     .returning('*')
                     .insert({
-                        name: name,
-                        email: loginEmail[0],
-                        joined: new Date()
+                        firstname:firstName,
+                        lastname: lastName,
+                        email: loginEmail[0]
                     })
                     .then(user => res.json(user[0]))
-                    .catch(err => res.json('not able to register'))
+                    .catch(err => res.json(err))
             })
             .then(trx.commit)
             .catch(trx.rollback)
     })
-        .catch(err => res.status(400).json('unable to register'))
+        .catch(err => res.status(400).json(err))
 })
 
 
