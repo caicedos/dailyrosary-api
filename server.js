@@ -34,7 +34,6 @@ app.post('/signin', (req, res) => {
     if (!email || !password) {
         return res.status(400).json('incorrect form submission');
     }
-    console.log(email, password)
     db.select('email', 'hash').from('login')
         .where('email', '=', email)
         .then(data => {
@@ -53,14 +52,11 @@ app.post('/signin', (req, res) => {
 })
 
 app.post('/profile', (req, res) => {
-    const { id, prayed, streak, level } = req.body
-    console.log('me llamaronnnnnnnnnnnnnn')
-    console.log(id, prayed, streak, level)
+    const { id, prayed, streak, level, lastlogouttime } = req.body
     db('users')
         .where({ id: id })
-        .update({ prayed, streak, level })
+        .update({ prayed, streak, level, lastlogouttime })
         .then(data=> {
-            console.log(data)
           res.json(data)  
         })
         .catch(err => res.status(400).json(err))
@@ -69,12 +65,11 @@ app.post('/profile', (req, res) => {
 )
 
 app.post('/register', (req, res) => {
-    const { firstName, lastName, email, password } = req.body
-    if(!email || !firstName || !lastName || !password){
+    const { firstName, lastName, email, password, joined } = req.body
+    if(!email || !firstName || !lastName || !password || !joined){
         return res.status(400).json('Incorrect form submission');
     }
     var hash = bcrypt.hashSync(password, saltRounds);
-    console.log(firstName, lastName, email, password, hash)
     db.transaction(trx => {
         trx.insert({
             hash: hash,
@@ -83,13 +78,13 @@ app.post('/register', (req, res) => {
             .into('login')
             .returning('email')
             .then(loginEmail => {
-                console.log(loginEmail)
                 return db('users')
                     .returning('*')
                     .insert({
                         firstname:firstName,
                         lastname: lastName,
-                        email: loginEmail[0]
+                        email: loginEmail[0],
+                        joined
                     })
                     .then(user => res.json(user[0]))
                     .catch(err => res.json(err))
