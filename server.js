@@ -15,15 +15,14 @@ const db = knex({
     client: 'pg',
     connection: {
         // heroku postgresql
-        // connectionString: process.env.DATABASE_URL,
-        ssl: false,
-        host: '127.0.0.1',
-        user: '',
-        password: '',
-        database: 'dailyrosary'
+        connectionString: process.env.DATABASE_URL
+        // ssl: false,
+        // host: '127.0.0.1',
+        // user: '',
+        // password: '',
+        // database: 'dailyrosary'
     }
 });
-
 
 app.get('/', (req, res) => {
     res.json('Hello World')
@@ -56,17 +55,16 @@ app.post('/profile', (req, res) => {
     db('users')
         .where({ id: id })
         .update({ prayed, streak, level, lastlogouttime })
-        .then(data=> {
-          res.json(data)  
+        .then(data => {
+            res.json(data)
         })
         .catch(err => res.status(400).json(err))
-}
-
+    }
 )
 
 app.post('/register', (req, res) => {
     const { firstName, lastName, email, password, joined } = req.body
-    if(!email || !firstName || !lastName || !password || !joined){
+    if (!email || !firstName || !lastName || !password || !joined) {
         return res.status(400).json('Incorrect form submission');
     }
     var hash = bcrypt.hashSync(password, saltRounds);
@@ -81,7 +79,7 @@ app.post('/register', (req, res) => {
                 return db('users')
                     .returning('*')
                     .insert({
-                        firstname:firstName,
+                        firstname: firstName,
                         lastname: lastName,
                         email: loginEmail[0],
                         joined
@@ -95,28 +93,7 @@ app.post('/register', (req, res) => {
         .catch(err => res.status(400).json(err))
 })
 
-
-
 const usedPort = port || 3000
 app.listen(usedPort, () => {
     console.log(`app is running on port: ${usedPort}`)
 })
-
-// onSubmitSignIn = () => {
-
-//     fetch("https://mighty-inlet-18738.herokuapp.com/signin", {
-//       method: "post",
-//       headers: { "content-type": "application/json" },
-//       body: JSON.stringify({
-//         email: this.state.signInEmail,
-//         password: this.state.signInPassword
-//       })
-//     })
-//       .then(response => response.json())
-//       .then(user => {
-//         if (user[0].id) {
-//           this.props.loadUser(user[0]);
-//           this.props.onRouteChange("home");
-//         }
-//       });
-//   };
