@@ -25,7 +25,7 @@ const db = knex({
 });
 
 app.get('/', (req, res) => {
-    res.json('Hello World')
+    res.json('Daily Rosary')
 })
 
 app.post('/signin', (req, res) => {
@@ -47,7 +47,7 @@ app.post('/signin', (req, res) => {
             }
             return res.status(400).json('Wrong Credentials')
         })
-        .catch(err => console.log(err))
+            .catch(err => res.status(400))
 })
 
 app.post('/profile', (req, res) => {
@@ -58,7 +58,7 @@ app.post('/profile', (req, res) => {
         .then(data => {
             res.json(data)
         })
-        .catch(err => res.status(400).json(err))
+        .catch(err => res.status(400))
     }
 )
 
@@ -90,7 +90,7 @@ app.post('/register', (req, res) => {
             .then(trx.commit)
             .catch(trx.rollback)
     })
-        .catch(err => res.status(400).json(err))
+        .catch(err => res.status(400))
 })
 
 const usedPort = port || 3000
